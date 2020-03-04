@@ -21,7 +21,10 @@ def contours1(img):
     get contours
 '''
 def contours2(img):
-    ret, thresh = Preprocess.removeHair(img)
+    # equalize Y channel hist
+    img=Preprocess.equalizeHistYChannel(img)
+    # remove artifacts
+    ret, thresh = Preprocess.removeArtifact(img)
     # search for contours and select the biggest one
     c, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
     cnt = max(contours, key=cv2.contourArea)
