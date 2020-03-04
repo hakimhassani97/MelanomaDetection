@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+from Data import Data
+from Preprocess import Preprocess
 
 '''
     method 1
@@ -19,29 +21,63 @@ def contours1(img):
     get contours
 '''
 def contours2(img):
-    # perform closing to remove hair and blur the image
-    kernel = np.ones((15,15),np.uint8)
-    closing = cv2.morphologyEx(img,cv2.MORPH_CLOSE,kernel, iterations = 2)
-    blur = cv2.blur(closing,(15,15))
-    # apply OTSU threshold
-    imgray = cv2.cvtColor(blur,cv2.COLOR_BGR2GRAY)
-    ret, thresh = cv2.threshold(imgray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+    ret, thresh = Preprocess.removeHair(img)
     # search for contours and select the biggest one
     c, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
     cnt = max(contours, key=cv2.contourArea)
     return cnt
 
 '''
+    draw bounding circle
+'''
+def boundingCircle(img,contour):
+    # get perimeter of contour
+    perimeter = cv2.arcLength(contour, True)
+    # get moment of contour
+    M = cv2.moments(contour)
+    # get center of gravity of contour
+    xe = int(M["m10"] / M["m00"])
+    ye = int(M["m01"] / M["m00"])
+    # get center of circle around the contour
+    radius = int(perimeter / (2 * np.pi))
+    # draw the circle and its center
+    cv2.circle(img, (xe, ye), radius=1, color=(0, 255, 255), thickness=1)
+    cv2.circle(img, (xe, ye), radius=radius, color=(0, 255, 255), thickness=1)
+
+'''
+    draw bounding rectangle
+'''
+def boundingRectangle(img,contour):
+    x,y,w,h = cv2.boundingRect(contour)
+    cv2.rectangle(img,(x,y),(x+w,y+h), color=(0, 255, 255), thickness=2)
+
+
+'''
+    get roundiness
+'''
+def roundness(contour):
+    # get surface of contour
+    area = cv2.contourArea(contour)
+    # get perimeter of contour
+    perimeter = cv2.arcLength(contour, True)
+    # get roundness
+    roundness = (4 * np.pi * area) / (perimeter * perimeter) * 100
+    roundness = round(roundness, 2)
+
+'''
     main program
 '''
-sImg='data/5.jpg'
-img=cv2.imread(sImg,cv2.IMREAD_COLOR)
-# get contours
-contours=contours2(img)
-# draw contours
-# img=np.zeros(np.shape(img))
-cv2.drawContours(img, contours, -1, (0,255,0), 1)
-cv2.imshow('img',img)
-
-cv2.waitKey()
+files=Data.loadFilesAsArray('data/')
+for file in files:
+    sImg='data/'+file
+    img=cv2.imread(sImg,cv2.IMREAD_COLOR)
+    # get contours
+    contour=contours2(img)
+    # draw contours
+    # img=np.zeros(np.shape(img))
+    cv2.drawContours(img, contour, -1, (0, 255, 255), 1)
+    boundingRectangle(img,contour)
+    cv2.imshow('img',img)
+    if cv2.waitKey() == ord('c'):
+        break
 cv2.destroyAllWindows()
