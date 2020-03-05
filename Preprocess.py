@@ -5,7 +5,7 @@ class Preprocess:
 
     '''
         removes hair (artifacts) from an image
-        morphologic close transformation with OTSU threshold
+        morphologic close transformation
     '''
     @staticmethod
     def removeArtifact(img):
