@@ -17,6 +17,7 @@ for file in files:
     # img=np.zeros(np.shape(img))
     cv2.drawContours(img, contour, -1, (0, 255, 255), 1)
     Contours.boundingRectangle(img,contour)
+    # Contours.boundingCircle(img,contour)
     cv2.imshow('img',img)
     if cv2.waitKey() == ord('c'):
         break
