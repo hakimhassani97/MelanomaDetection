@@ -29,7 +29,7 @@ class Contours:
         # remove artifacts
         # img = Preprocess.removeArtifact(img)
         # remove RGB artifact
-        img=Preprocess.removeArtifactRGB(img)
+        img=Preprocess.removeArtifactYUV(img)
         # apply OTSU threshold
         ret, thresh = Preprocess.OTSUThreshold(img)
         # search for contours and select the biggest one
