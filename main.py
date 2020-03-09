@@ -10,8 +10,8 @@ from Caracteristics import Caracteristics
 '''
 # TYPE='Melanoma'
 TYPE='Nevus'
-BDD='ISIC'
-# BDD='PH2'
+# BDD='ISIC'
+BDD='PH2'
 BDD_LOCATION='D:/HAKIM/MIV M2/PFE/fichiers prof/MIV 96-2019/Application MIV 96-2019/Code/BDD/'
 DATA=BDD_LOCATION+BDD+'/'+TYPE+'/'
 files=Data.loadFilesAsArray(DATA)
