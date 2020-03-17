@@ -32,17 +32,10 @@ class Data:
         downloads the ISIC dataset from ISIC's API
     '''
     @staticmethod
-    def downloadISIC():
+    def downloadISICImages():
         # request.urlretrieve("http://www.gunnerkrigg.com//comics/00000001.jpg", "00000001.jpg")
         API_URL='https://isic-archive.com/api/v1/image'
         dst='D:/HAKIM/MIV M2/PFE/project/data/ISIC/images/'
-        # login to ISIC API
-        with open('config.json') as config:
-            credentials = json.load(config)
-        username = credentials['username']
-        password = credentials['password']
-        api = ISICApi(username=username, password=password)
-        # set API params
         limit=50
         params={'limit':50}
         params = urllib.parse.urlencode(params)
@@ -55,6 +48,33 @@ class Data:
         for i,result in enumerate(results):
             print(str(i),result)
             # urllib.request.urlretrieve(API_URL+'/'+result['_id']+'/download', dst+result['name']+".bmp")
+    
+    '''
+        download ISIC segmentations
+    '''
+    def downloadISICSegmentations():
+        # request.urlretrieve("http://www.gunnerkrigg.com//comics/00000001.jpg", "00000001.jpg")
+        API_URL='https://isic-archive.com/api/v1/image'
+        dst='D:/HAKIM/MIV M2/PFE/project/data/ISIC/segmentation/'
+        # set API params
+        limit=50
+        params={'limit':50}
+        params = urllib.parse.urlencode(params)
+        # get request the ISIC API
+        results=urllib.request.urlopen(API_URL+'?%s'%params)
+        results=results.read()
+        # convert result to JSON
+        results=json.loads(results)
+        # login to ISIC API
+        with open('config.json') as config:
+            credentials = json.load(config)
+        username = credentials['username']
+        password = credentials['password']
+        api = ISICApi(username=username, password=password)
+        # loop throught JSON
+        for i,result in enumerate(results):
+            print(str(i)+'/'+str(len(results)),result)
+            api.downloadSegmentationMask(result['_id'],result['name'],dst)
+            # urllib.request.urlretrieve(API_URL+'/'+result['_id']+'/download', dst+result['name']+".bmp")
 
-
-Data.downloadISIC()
+# Data.downloadISICSegmentations()

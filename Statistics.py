@@ -8,8 +8,10 @@ class Statistics:
         segments and saves images with our methode
     '''
     def segmentAndSave():
-        DATA='D:/HAKIM/MIV M2/PFE/project/data/PH2/images/'
-        DEST='D:/HAKIM/MIV M2/PFE/project/data/PH2/segmentation/'
+        BDD='ISIC'
+        # BD='PH2'
+        DATA='D:/HAKIM/MIV M2/PFE/project/data/'+BDD+'/images/'
+        DEST='D:/HAKIM/MIV M2/PFE/project/data/'+BDD+'/segmentation/'
         files=Data.loadFilesAsArray(DATA)
         for file in files:
             sImg=DATA+file
@@ -35,23 +37,37 @@ class Statistics:
         area = np.count_nonzero(imgTruth==255)
         intersectionArea = np.count_nonzero(intersection==255)
         return intersectionArea/area
+    
+    '''
+        compares all the images for a giver database
+    '''
+    def compareAll():
+        BDD='ISIC'
+        # BDD='PH2'
+        DATA_TRUTH='D:/HAKIM/MIV M2/PFE/project/data/'+BDD+'/truth/'
+        DATA_SEGMENTATION='D:/HAKIM/MIV M2/PFE/project/data/'+BDD+'/segmentation/'
+        files=Data.loadFilesAsArray(DATA_SEGMENTATION)
+        # result = [np.array(['imgName','ratio'])]
+        result=[]
+
+        for file in files:
+            img=cv2.imread(DATA_SEGMENTATION+file,cv2.IMREAD_GRAYSCALE)
+            suffixe= '_lesion.bmp'
+            if BDD=='ISIC':
+                suffixe='.bmp'
+            imgTruth=cv2.imread(DATA_TRUTH+file.replace('.bmp',suffixe),cv2.IMREAD_GRAYSCALE)
+            ratio = Statistics.compare(img,imgTruth)
+            result.append(np.array([file,ratio]))
+        result=np.array(result)
+        # print(result)
+        result=result[:,1].astype(np.float)
+        mean=np.mean(result)
+        print(BDD,mean)
+        # np.savetxt('Ratio results.txt',result)
+        return mean
 
 '''
     Statistics program
 '''
 # Statistics.segmentAndSave()
-DATA_TRUTH='D:/HAKIM/MIV M2/PFE/project/data/PH2/truth/'
-DATA_SEGMENTATION='D:/HAKIM/MIV M2/PFE/project/data/PH2/segmentation/'
-files=Data.loadFilesAsArray(DATA_SEGMENTATION)
-# result = [np.array(['imgName','ratio'])]
-result=[]
-
-for file in files:
-    img=cv2.imread(DATA_SEGMENTATION+file,cv2.IMREAD_GRAYSCALE)
-    imgTruth=cv2.imread(DATA_TRUTH+file.replace('.bmp','')+'_lesion.bmp',cv2.IMREAD_GRAYSCALE)
-    ratio = Statistics.compare(img,imgTruth)
-    result.append(np.array([file,ratio]))
-result=np.array(result)
-result=result[:,1].astype(np.float)
-print(np.mean(result))
-# np.savetxt('Ratio results.txt',result)
+Statistics.compareAll()
