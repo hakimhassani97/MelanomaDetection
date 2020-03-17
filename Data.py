@@ -36,8 +36,7 @@ class Data:
         # request.urlretrieve("http://www.gunnerkrigg.com//comics/00000001.jpg", "00000001.jpg")
         API_URL='https://isic-archive.com/api/v1/image'
         dst='D:/HAKIM/MIV M2/PFE/project/data/ISIC/images/'
-        limit=50
-        params={'limit':50}
+        params={'limit':260,'offset':0}
         params = urllib.parse.urlencode(params)
         # get request the ISIC API
         results=urllib.request.urlopen(API_URL+'?%s'%params)
@@ -47,7 +46,7 @@ class Data:
         # loop throught JSON
         for i,result in enumerate(results):
             print(str(i),result)
-            # urllib.request.urlretrieve(API_URL+'/'+result['_id']+'/download', dst+result['name']+".bmp")
+            urllib.request.urlretrieve(API_URL+'/'+result['_id']+'/download', dst+result['name']+".bmp")
     
     '''
         download ISIC segmentations
@@ -57,8 +56,7 @@ class Data:
         API_URL='https://isic-archive.com/api/v1/image'
         dst='D:/HAKIM/MIV M2/PFE/project/data/ISIC/segmentation/'
         # set API params
-        limit=50
-        params={'limit':50}
+        params={'limit':200,'offset':248}
         params = urllib.parse.urlencode(params)
         # get request the ISIC API
         results=urllib.request.urlopen(API_URL+'?%s'%params)
@@ -77,4 +75,5 @@ class Data:
             api.downloadSegmentationMask(result['_id'],result['name'],dst)
             # urllib.request.urlretrieve(API_URL+'/'+result['_id']+'/download', dst+result['name']+".bmp")
 
+# Data.downloadISICImages()
 # Data.downloadISICSegmentations()
