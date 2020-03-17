@@ -1,5 +1,9 @@
 import os
 import shutil
+import urllib
+import json
+import requests
+from ISICApi import ISICApi
 
 class Data:
     @staticmethod
@@ -23,4 +27,32 @@ class Data:
             else:
                 dstImg='0_'+img
             shutil.copy2(s+'/'+img,dst+dstImg)
-Data.loadImagesToFolder()
+    
+    '''
+        downloads the ISIC dataset from ISIC's API
+    '''
+    @staticmethod
+    def downloadISIC():
+        # request.urlretrieve("http://www.gunnerkrigg.com//comics/00000001.jpg", "00000001.jpg")
+        API_URL='https://isic-archive.com/api/v1/image'
+        dst='D:/HAKIM/MIV M2/PFE/project/data/ISIC/images/'
+        # login to ISIC API
+        username = 'hakimhassani97@gmail.com'
+        password = '@Kimo1234'
+        api = ISICApi(username=username, password=password)
+        # set API params
+        limit=50
+        params={'limit':50}
+        params = urllib.parse.urlencode(params)
+        # get request the ISIC API
+        results=urllib.request.urlopen(API_URL+'?%s'%params)
+        results=results.read()
+        # convert result to JSON
+        results=json.loads(results)
+        # loop throught JSON
+        for i,result in enumerate(results):
+            print(str(i),result)
+            # urllib.request.urlretrieve(API_URL+'/'+result['_id']+'/download', dst+result['name']+".bmp")
+
+
+Data.downloadISIC()
