@@ -43,7 +43,8 @@ class Statistics:
 DATA_TRUTH='D:/HAKIM/MIV M2/PFE/project/data/PH2/truth/'
 DATA_SEGMENTATION='D:/HAKIM/MIV M2/PFE/project/data/PH2/segmentation/'
 files=Data.loadFilesAsArray(DATA_SEGMENTATION)
-result = [np.array(['imgName','ratio'])]
+# result = [np.array(['imgName','ratio'])]
+result=[]
 
 for file in files:
     img=cv2.imread(DATA_SEGMENTATION+file,cv2.IMREAD_GRAYSCALE)
@@ -51,5 +52,6 @@ for file in files:
     ratio = Statistics.compare(img,imgTruth)
     result.append(np.array([file,ratio]))
 result=np.array(result)
-print(result)
+result=result[:,1].astype(np.float)
+print(np.mean(result))
 # np.savetxt('Ratio results.txt',result)
