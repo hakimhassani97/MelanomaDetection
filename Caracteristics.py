@@ -42,7 +42,7 @@ class Caracteristics:
         blankImg = imutils.rotate(blankImg, angle+90)
         v = np.sum(blankImg, axis=0)
         h = np.sum(blankImg, axis=1)
-        print(v)
+        # print(v)
         # print(h)
         cv2.imshow('t',blankImg)
     
