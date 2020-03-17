@@ -56,7 +56,7 @@ class Data:
         API_URL='https://isic-archive.com/api/v1/image'
         dst='D:/HAKIM/MIV M2/PFE/project/data/ISIC/truth/'
         # set API params
-        params={'limit':200,'offset':248}
+        params={'limit':260,'offset':0}
         params = urllib.parse.urlencode(params)
         # get request the ISIC API
         results=urllib.request.urlopen(API_URL+'?%s'%params)
