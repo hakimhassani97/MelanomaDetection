@@ -37,8 +37,10 @@ class Data:
         API_URL='https://isic-archive.com/api/v1/image'
         dst='D:/HAKIM/MIV M2/PFE/project/data/ISIC/images/'
         # login to ISIC API
-        username = 'hakimhassani97@gmail.com'
-        password = '@Kimo1234'
+        with open('config.json') as config:
+            credentials = json.load(config)
+        username = credentials['username']
+        password = credentials['password']
         api = ISICApi(username=username, password=password)
         # set API params
         limit=50
