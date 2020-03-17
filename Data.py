@@ -54,7 +54,7 @@ class Data:
     def downloadISICSegmentations():
         # request.urlretrieve("http://www.gunnerkrigg.com//comics/00000001.jpg", "00000001.jpg")
         API_URL='https://isic-archive.com/api/v1/image'
-        dst='D:/HAKIM/MIV M2/PFE/project/data/ISIC/segmentation/'
+        dst='D:/HAKIM/MIV M2/PFE/project/data/ISIC/truth/'
         # set API params
         params={'limit':200,'offset':248}
         params = urllib.parse.urlencode(params)
