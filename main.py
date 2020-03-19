@@ -32,7 +32,7 @@ for file in files:
     x, y = 0, np.shape(img)[0]-3
     cv2.putText(img,'roundness : '+str(roundness), (x,y), cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.5, color=(0, 0, 0), lineType=1)
     # get assymetry
-    Caracteristics.assymetry(img,contour)
+    # Caracteristics.assymetry(img,contour)
     cv2.imshow('img',img)
     if cv2.waitKey() == ord('c'):
         break
