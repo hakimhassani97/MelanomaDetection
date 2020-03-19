@@ -33,7 +33,7 @@ class Contours:
         # ret,label,center=cv2.kmeans(Z,K,None,criteria,10,cv2.KMEANS_RANDOM_CENTERS)
         # center = np.uint8(center)
         # res = center[label.flatten()]
-        img = res.reshape((img.shape))
+        # img = res.reshape((img.shape))
         # equalize Y channel hist
         # img=Preprocess.equalizeHistYChannel(img)
         # remove artifacts
