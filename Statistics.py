@@ -9,7 +9,7 @@ class Statistics:
     '''
     def segmentAndSave():
         BDD='ISIC'
-        # BD='PH2'
+        # BDD='PH2'
         DATA='D:/HAKIM/MIV M2/PFE/project/data/'+BDD+'/images/'
         DEST='D:/HAKIM/MIV M2/PFE/project/data/'+BDD+'/segmentation/'
         files=Data.loadFilesAsArray(DATA)
