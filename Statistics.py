@@ -8,8 +8,6 @@ class Statistics:
         segments and saves images with our methode
     '''
     def segmentAndSave():
-        BDD='ISIC'
-        # BDD='PH2'
         DATA='D:/HAKIM/MIV M2/PFE/project/data/'+BDD+'/images/'
         DEST='D:/HAKIM/MIV M2/PFE/project/data/'+BDD+'/segmentation/'
         files=Data.loadFilesAsArray(DATA)
@@ -34,22 +32,20 @@ class Statistics:
     @staticmethod
     def compare(img,imgTruth):
         intersection = cv2.bitwise_and(img, imgTruth)
-        area = np.count_nonzero(imgTruth==255)
+        area = np.count_nonzero(img==255)
+        areaTruth = np.count_nonzero(imgTruth==255)
         intersectionArea = np.count_nonzero(intersection==255)
-        return intersectionArea/area
+        return (intersectionArea/area + intersectionArea/areaTruth) / 2
     
     '''
         compares all the images for a giver database
     '''
     def compareAll():
-        BDD='ISIC'
-        # BDD='PH2'
         DATA_TRUTH='D:/HAKIM/MIV M2/PFE/project/data/'+BDD+'/truth/'
         DATA_SEGMENTATION='D:/HAKIM/MIV M2/PFE/project/data/'+BDD+'/segmentation/'
         files=Data.loadFilesAsArray(DATA_SEGMENTATION)
         # result = [np.array(['imgName','ratio'])]
         result=[]
-
         for file in files:
             img=cv2.imread(DATA_SEGMENTATION+file,cv2.IMREAD_GRAYSCALE)
             suffixe= '_lesion.bmp'
@@ -69,5 +65,9 @@ class Statistics:
 '''
     Statistics program
 '''
-# Statistics.segmentAndSave()
+BDD='PH2'
+Statistics.segmentAndSave()
+Statistics.compareAll()
+BDD='ISIC'
+Statistics.segmentAndSave()
 Statistics.compareAll()

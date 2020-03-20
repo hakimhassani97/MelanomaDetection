@@ -85,5 +85,38 @@ class Preprocess:
         blur = cv2.blur(img,(15,15))
         # apply OTSU threshold
         imgray = cv2.cvtColor(blur,cv2.COLOR_RGB2GRAY)
+        # remove tint effect
+        # if Preprocess.hasTint(img):
+        mask = Preprocess.removeTint(img)
+        imgray = cv2.add(imgray, mask)
+        # # noise removal
+        kernel = np.ones((7,7),np.uint8)
+        imgray = cv2.morphologyEx(imgray,cv2.MORPH_ERODE,kernel, iterations = 2)
+        # cv2.imshow('mask',imgray)
         ret, thresh = cv2.threshold(imgray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
         return ret, thresh
+    
+    '''
+        returns a mask that removes tint effect from corners of the img
+        https://stackoverflow.com/questions/42594993/gradient-mask-blending-in-opencv-python
+    '''
+    @staticmethod
+    def removeTint(img):
+        H,W = img.shape[:2]
+        mask = np.zeros((H,W), np.uint8)
+        cv2.circle(mask, (W//2, H//2), W//2 + W//50, (150,150,150), -1, cv2.LINE_AA)
+        mask = cv2.blur(mask, (321,321))
+        mask = 160 - mask
+        return mask
+
+    @staticmethod
+    def hasTint(img):
+        imgray = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
+        H,W = imgray.shape[:2]
+        mask = np.zeros((H,W), np.uint8)
+        cv2.circle(mask, (W//2, H//2), W//2 + W//50, (255,255,255), -1, cv2.LINE_AA)
+        mask = cv2.blur(mask, (21,21))
+        # mask = 255 - mask
+        mask = cv2.subtract(imgray, mask)
+        seuil = 140
+        return mask[10,10]<seuil
