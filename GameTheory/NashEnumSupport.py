@@ -16,6 +16,9 @@ class NashEnumSupport(object):
         except AttributeError:
             print("type de A,B doit etre 'numpy.ndarray' et meme dimension")
 
+    '''
+        get min between h,w of matrix
+    '''
     def min(self,w):
         if w[0] >= w[1]:
             return 1
@@ -33,29 +36,19 @@ class NashEnumSupport(object):
             else:
                 X.extend(np.ones((1, t), dtype=int)[0])
                 self.l.append(X)
-
         else:
             if x > 0:
                 X.extend(np.zeros((1, x), dtype=int)[0])
                 self.l.append(X)
-
                 if x >= self.W[1 - self.T] - self.W[self.T]:
                     self.ll.append(X[:self.W[self.T]])
 
     def supp(self,x=list()):
-
         arr = np.zeros((len(self.l),), dtype=[('var1', list), ('var2', list)])
-
         arr[:] = (0, x.copy())
-
         arr['var1'] = self.l.copy()
-
         arr = list(map(self.lineair,arr))
-
-
-
         list(map(self.test, arr))
-
         arr = np.array([])
 
     def lineair(self,xy):
