@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+
 class Preprocess:
 
     '''
@@ -10,10 +11,10 @@ class Preprocess:
     @staticmethod
     def removeArtifact(img):
         # perform closing to remove hair
-        kernel = np.ones((15,15),np.uint8)
-        closing = cv2.morphologyEx(img,cv2.MORPH_CLOSE,kernel, iterations = 2)
+        kernel = np.ones((15, 15), np.uint8)
+        closing = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel, iterations=2)
         return closing
-    
+
     '''
         ASLM Noise Removal
         equalizes the Y channel of an YUV image, Y contains the intensity information
@@ -25,11 +26,11 @@ class Preprocess:
         # convert image to YUV
         img_yuv = cv2.cvtColor(img, cv2.COLOR_BGR2YUV)
         # equalize the histogram of the Y channel
-        img_yuv[:,:,0] = cv2.equalizeHist(img_yuv[:,:,0])
+        img_yuv[:, :, 0] = cv2.equalizeHist(img_yuv[:, :, 0])
         # convert image to RGB
         img = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2BGR)
         return img
-    
+
     '''
         DR noise removal
         apply morphologic close transformation on each channel of RGB image
@@ -75,48 +76,52 @@ class Preprocess:
         # back to RGB
         imgResult = cv2.cvtColor(imgResult, cv2.COLOR_YUV2RGB)
         return imgResult
-    
+
     '''
         apply OTSU threshold
     '''
     @staticmethod
     def OTSUThreshold(img):
         # blur the image
-        blur = cv2.blur(img,(15,15))
+        blur = cv2.blur(img, (15, 15))
         # apply OTSU threshold
-        imgray = cv2.cvtColor(blur,cv2.COLOR_RGB2GRAY)
+        imgray = cv2.cvtColor(blur, cv2.COLOR_RGB2GRAY)
         # remove tint effect
         # if Preprocess.hasTint(img):
         mask = Preprocess.removeTint(img)
         imgray = cv2.add(imgray, mask)
         # # noise removal
-        kernel = np.ones((7,7),np.uint8)
-        imgray = cv2.morphologyEx(imgray,cv2.MORPH_ERODE,kernel, iterations = 2)
+        kernel = np.ones((7, 7), np.uint8)
+        imgray = cv2.morphologyEx(
+            imgray, cv2.MORPH_ERODE, kernel, iterations=2)
         # cv2.imshow('mask',imgray)
-        ret, thresh = cv2.threshold(imgray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+        ret, thresh = cv2.threshold(
+            imgray, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
         return ret, thresh
-    
+
     '''
         returns a mask that removes tint effect from corners of the img
         https://stackoverflow.com/questions/42594993/gradient-mask-blending-in-opencv-python
     '''
     @staticmethod
     def removeTint(img):
-        H,W = img.shape[:2]
-        mask = np.zeros((H,W), np.uint8)
-        cv2.circle(mask, (W//2, H//2), W//2 + W//50, (150,150,150), -1, cv2.LINE_AA)
-        mask = cv2.blur(mask, (321,321))
+        H, W = img.shape[:2]
+        mask = np.zeros((H, W), np.uint8)
+        cv2.circle(mask, (W//2, H//2), W//2 + W//50,
+                   (150, 150, 150), -1, cv2.LINE_AA)
+        mask = cv2.blur(mask, (321, 321))
         mask = 160 - mask
         return mask
 
     @staticmethod
     def hasTint(img):
-        imgray = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
-        H,W = imgray.shape[:2]
-        mask = np.zeros((H,W), np.uint8)
-        cv2.circle(mask, (W//2, H//2), W//2 + W//50, (255,255,255), -1, cv2.LINE_AA)
-        mask = cv2.blur(mask, (21,21))
+        imgray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        H, W = imgray.shape[:2]
+        mask = np.zeros((H, W), np.uint8)
+        cv2.circle(mask, (W//2, H//2), W//2 + W//50,
+                   (255, 255, 255), -1, cv2.LINE_AA)
+        mask = cv2.blur(mask, (21, 21))
         # mask = 255 - mask
         mask = cv2.subtract(imgray, mask)
         seuil = 140
-        return mask[10,10]<seuil
+        return mask[10, 10] < seuil
