@@ -39,7 +39,7 @@ class Caracteristics:
         contour = Caracteristics.translateContour(contour,x,y)
         cv2.drawContours(blankImg, [contour], -1, (255, 255, 255), -1)
         # cv2.line(blankImg, (int(w/2), int(h/2)), (int(w/2)+h, int(h/2)+h), (0, 255, 0), 1)
-        blankImg = imutils.rotate(blankImg, angle+90)
+        blankImg = imutils.rotate_bound(blankImg, angle+90)
         v = np.sum(blankImg, axis=0)
         h = np.sum(blankImg, axis=1)
         # print(v)
