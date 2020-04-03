@@ -101,6 +101,10 @@ class Contours:
         dist = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
         return dist
 
+    def Diagonale(w, h):
+        dist = math.sqrt((w)**2 + (h)**2)
+        return dist
+
     @staticmethod
     def AssymetryByDistance(img, contour):
         # get moment of contour
@@ -119,7 +123,7 @@ class Contours:
 
         # get surface of contour
         area = cv2.contourArea(contour)
-        return (math.sqrt((xe - xReCe)**2 + (ye - yReCe)**2) / area)
+        return 100 - (Contours.DistanceEuclidean(xe, ye, xReCe, yReCe) * 100 / Contours.Diagonale(w, h))
 
     '''
       End  All About Assymetry
