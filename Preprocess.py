@@ -118,6 +118,21 @@ class Preprocess:
         return result
 
     '''
+    '''
+    @staticmethod
+    def KMEANS(img):
+        # apply KMEANS
+        Z = img.reshape((-1,3))
+        # convert to np.float32
+        Z = np.float32(Z)
+        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+        K = 5
+        ret,label,center=cv2.kmeans(Z,K,None,criteria,10,cv2.KMEANS_RANDOM_CENTERS)
+        center = np.uint8(center)
+        res = center[label.flatten()]
+        result = res.reshape((img.shape))
+        return result
+    '''
         returns a mask that removes tint effect from corners of the img
         https://stackoverflow.com/questions/42594993/gradient-mask-blending-in-opencv-python
     '''
