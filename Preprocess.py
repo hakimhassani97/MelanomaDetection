@@ -95,7 +95,28 @@ class Preprocess:
         # cv2.imshow('mask',imgray)
         ret, thresh = cv2.threshold(imgray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
         return ret, thresh
-    
+
+    '''
+        uses the SLIC clustering to extract borders
+        returns the result img
+    '''
+    @staticmethod
+    def SLIC(img):
+        slic = cv2.ximgproc.createSuperpixelSLIC(img, algorithm=cv2.ximgproc.MSLIC, region_size=300, ruler=0.075)
+        color_img = np.zeros(img.shape, np.uint8)
+        color_img[:] = (0, 0, 0)
+        for n in range(2):
+            slic.iterate(2)
+        slic.enforceLabelConnectivity()
+        mask = slic.getLabelContourMask(False)
+        # stitch foreground & background together
+        mask_inv = cv2.bitwise_not(mask)
+        result_bg = cv2.bitwise_and(img, img, mask=mask_inv)
+        result_fg = cv2.bitwise_and(color_img, color_img, mask=mask)
+        result = cv2.add(result_bg, result_fg)
+        # cv2.imshow('SLIC',mask_inv)
+        return result
+
     '''
         returns a mask that removes tint effect from corners of the img
         https://stackoverflow.com/questions/42594993/gradient-mask-blending-in-opencv-python
