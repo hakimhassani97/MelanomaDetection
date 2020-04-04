@@ -26,6 +26,8 @@ for file in files:
     # get boundings
     Contours.boundingRectangle(img,contour)
     # Contours.boundingCircle(img,contour)
+    # get Compact Index
+    print(Caracteristics.regularityIndexPercentage(contour))
     # get roundness
     roundness=Caracteristics.roundness(img,contour)
     roundness=round(roundness,2)
