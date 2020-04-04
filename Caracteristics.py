@@ -102,5 +102,19 @@ class Caracteristics:
     '''
     @staticmethod
     def nbColors(img, contour):
-        img = Preprocess.KMEANS(img, K=2)
-        pass
+        lesion = Caracteristics.extractLesion(img, contour)
+        cv2.imshow('nb colors', lesion)
+    
+    '''
+        needed for Color C
+        extract lesion
+    '''
+    @staticmethod
+    def extractLesion(img, contour):
+        mask = np.zeros(img.shape, dtype='uint8')
+        mask = cv2.drawContours(mask, [contour], -1, (255 , 255 , 255),thickness=cv2.FILLED)
+        # mask = cv2.bitwise_not(mask)
+        img2gray = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+        ret, mask = cv2.threshold(img2gray, 10, 255, cv2.THRESH_BINARY)
+        lesion = cv2.bitwise_and(img, img, mask=mask)
+        return lesion
