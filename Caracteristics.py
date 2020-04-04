@@ -55,3 +55,52 @@ class Caracteristics:
             p[0][0]-=dx
             p[0][1]-=dy
         return contour
+    
+    '''
+        needed for Border B
+        get Compact Index of a lesion
+    '''
+    @staticmethod
+    def compactIndex(contour):
+        # get contour perimeter
+        contourPerimeter = cv2.arcLength(contour, True)
+        # get contour area
+        contourArea = cv2.contourArea(contour)
+        return (contourPerimeter**2) / (4*np.pi*contourArea)
+    
+    '''
+        needed for Border B
+        get regularity index
+    '''
+    @staticmethod
+    def regularityIndex(contour):
+        # get contour perimeter
+        contourPerimeter = cv2.arcLength(contour, True)
+        # get contour area
+        contourArea = cv2.contourArea(contour)
+        return contourPerimeter / contourArea
+    
+    '''
+        needed for Border B
+        get regularity index 2
+    '''
+    @staticmethod
+    def regularityIndexPercentage(contour):
+        # get contour perimeter
+        contourPerimeter = cv2.arcLength(contour, True)
+        # get contour area
+        contourArea = cv2.contourArea(contour)
+        # get circle with same piremeter as contour
+        radius = int(contourPerimeter / (2 * np.pi))
+        # circle area
+        circleArea = np.pi * (radius ** 2)
+        return contourArea / circleArea
+    
+    '''
+        needed for Color C
+        get number of colors
+    '''
+    @staticmethod
+    def nbColors(img, contour):
+        img = Preprocess.KMEANS(img, K=2)
+        pass
