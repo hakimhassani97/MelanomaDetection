@@ -28,6 +28,8 @@ for file in files:
     # Contours.boundingCircle(img,contour)
     # get Compact Index
     print(Caracteristics.regularityIndexPercentage(contour))
+    # get number of colors
+    Caracteristics.colorThreshold(img, contour)
     # get roundness
     roundness=Caracteristics.roundness(img,contour)
     roundness=round(roundness,2)

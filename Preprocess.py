@@ -132,7 +132,7 @@ class Preprocess:
         center = np.uint8(center)
         res = center[label.flatten()]
         result = res.reshape((img.shape))
-        return result
+        return result, center
 
     '''
         returns a mask that removes tint effect from corners of the img

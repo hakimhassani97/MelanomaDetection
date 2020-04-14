@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 import imutils
+from Preprocess import Preprocess
+import math
+from matplotlib import pyplot as plt
 
 '''
     get ABCD, 7 points, menzies caracteristics
@@ -98,16 +101,95 @@ class Caracteristics:
     
     '''
         needed for Color C
-        get number of colors
+        gets number of colors from kmeans centers
     '''
     @staticmethod
     def nbColors(img, contour):
-        lesion = Caracteristics.extractLesion(img, contour)
+        lesion = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        lesion = Caracteristics.extractLesion(lesion, contour)
+        lesion, centers = Preprocess.KMEANS(lesion, K=7)
+        distances = np.array([])
+        for i in range(0, len(centers)-1):
+            for j in range(i+1 ,len(centers)):
+                center = centers[i]
+                center2 = centers[j]
+                r = (float(center[0])-float(center2[0]))**2 + (float(center[1])-float(center2[1]))**2 + (float(center[2])-float(center2[2]))**2
+                d = math.sqrt(r)
+                distances = np.append(distances, d)
+        # for i, center in enumerate(centers):
+        #     for j, center2 in enumerate(centers):
+        #         if(i != j):
+        #             r = (float(center[0])-float(center2[0]))**2 + (float(center[1])-float(center2[1]))**2 + (float(center[2])-float(center2[2]))**2
+        #             d = math.sqrt(r)
+        #             distances = np.append(distances, d)
+        print(np.sum(distances))
         cv2.imshow('nb colors', lesion)
     
     '''
         needed for Color C
-        extract lesion
+        gets number of colors from color histogram
+    '''
+    @staticmethod
+    def nbColorsHist(img, contour):
+        lesion = Caracteristics.extractLesion(img, contour)
+        lesion = cv2.cvtColor(lesion, cv2.COLOR_BGR2HSV)
+        lesionH, lesionS, lesionV = cv2.split(lesion)
+        # plt.hist(lesionS.ravel(),256,[0,256])
+        hist = cv2.calcHist( [lesion], [0, 1], None, [180, 256], [0, 180, 0, 256] )
+        plt.imshow(hist)#, interpolation = 'nearest')
+        plt.show(0)
+        cv2.imshow('nb colors hsv', lesionS)
+    
+    '''
+        needed for color C
+        Kurtosis, color distribution
+    '''
+    @staticmethod
+    def kurtosis(img, contour):
+        lesion = Caracteristics.extractLesion(img, contour)
+        lesion = cv2.cvtColor(lesion, cv2.COLOR_BGR2GRAY)
+        area = cv2.contourArea(contour)
+        summ = np.sum(lesion)
+        mean = summ/area
+        r = np.subtract(lesion, mean)
+        r = np.power(r, 4)
+        r = np.sum(r) / area
+        print(r)
+        cv2.imshow('nb colors hsv', lesion)
+    
+    '''
+        needed for color C
+        color thresholds, https://alloyui.com/examples/color-picker/hsv.html
+    '''
+    @staticmethod
+    def colorThreshold(img, contour):
+        lesion = Caracteristics.extractLesion(img, contour)
+        centers = [
+            # white
+            [255, 255, 255],
+            # red
+            [255, 0, 0],
+            # black
+            [0, 0, 0],
+            # brown
+            [139, 69, 19],
+            # grey blue
+            [40, 60, 80]
+        ]
+        distances = np.array([])
+        for i in range(0, len(centers)-1):
+            for j in range(i+1 ,len(centers)):
+                center = centers[i]
+                center2 = centers[j]
+                r = (float(center[0])-float(center2[0]))**2 + (float(center[1])-float(center2[1]))**2 + (float(center[2])-float(center2[2]))**2
+                d = math.sqrt(r)
+                distances = np.append(distances, d)
+        cv2.imshow('nb colors', lesion)
+        
+    
+    '''
+        needed for Color C
+        extracts the lesion
     '''
     @staticmethod
     def extractLesion(img, contour):
