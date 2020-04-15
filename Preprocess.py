@@ -1,3 +1,4 @@
+
 import cv2
 import numpy as np
 
@@ -98,6 +99,47 @@ class Preprocess:
         ret, thresh = cv2.threshold(
             imgray, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
         return ret, thresh
+
+    '''
+        uses the SLIC clustering to extract borders
+        https://jayrambhia.com/blog/superpixels-slic
+        returns the result img
+    '''
+    @staticmethod
+    def SLIC(img):
+        slic = cv2.ximgproc.createSuperpixelSLIC(
+            img, algorithm=cv2.ximgproc.MSLIC, region_size=300, ruler=0.075)
+        color_img = np.zeros(img.shape, np.uint8)
+        color_img[:] = (0, 0, 0)
+        for n in range(2):
+            slic.iterate(2)
+        slic.enforceLabelConnectivity()
+        mask = slic.getLabelContourMask(False)
+        # stitch foreground & background together
+        mask_inv = cv2.bitwise_not(mask)
+        result_bg = cv2.bitwise_and(img, img, mask=mask_inv)
+        result_fg = cv2.bitwise_and(color_img, color_img, mask=mask)
+        result = cv2.add(result_bg, result_fg)
+        # cv2.imshow('SLIC',mask_inv)
+        return result
+
+    '''
+        uses KMEANS clustering
+    '''
+    @staticmethod
+    def KMEANS(img, K=5):
+        # apply KMEANS
+        Z = img.reshape((-1, 3))
+        # convert to np.float32
+        Z = np.float32(Z)
+        criteria = (cv2.TERM_CRITERIA_EPS +
+                    cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+        ret, label, center = cv2.kmeans(
+            Z, K, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+        center = np.uint8(center)
+        res = center[label.flatten()]
+        result = res.reshape((img.shape))
+        return result, center
 
     '''
         returns a mask that removes tint effect from corners of the img
