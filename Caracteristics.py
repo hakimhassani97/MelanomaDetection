@@ -180,6 +180,10 @@ class Caracteristics:
             # grey blue
             [75, 84, 111]
         ]
+        # resize ration
+        ratio = 4
+        h, w = np.shape(lesion)[:2]
+        lesion = cv2.resize(lesion, (w//ratio, h//ratio))
         h, w = np.shape(lesion)[:2]
         for x in range(0, w):
             for y in range(0, h):
@@ -190,21 +194,64 @@ class Caracteristics:
                         center2 = centers[i]
                         r = (float(center[0])-float(center2[0]))**2 + (float(center[1])-float(center2[1]))**2 + (float(center[2])-float(center2[2]))**2
                         d = math.sqrt(r)
-                        # distances.append(d)
                         distances[i] = d
                     minim = min(distances)
                     m = distances.index(minim)
-                    seuil = 35
-                    lesion[y][x] = centers[m] if minim<seuil else [0,255,0]
-                    if minim<seuil:
-                        colorCount[m] += 1
+                    # seuil = 15
+                    lesion[y][x] = colors[m] #if minim<seuil else [0,255,0]
+                    # if minim<seuil:
+                    colorCount[m] += 1
+        area = cv2.contourArea(contour)
         colorCount = np.array(colorCount)
-        nbColors = np.count_nonzero(colorCount>600)
+        # print(colorCount)
+        nbColors = np.count_nonzero(colorCount>(area*0.01))
         print(nbColors)
         # cv2.imshow('nb colors', lesion)
         return nbColors
-        
     
+    '''
+        thresh numpy
+    '''
+    @staticmethod
+    def colorThresholdNumpy(img, contour):
+        img = Preprocess.removeArtifactYUV(img)
+        lesion = Caracteristics.extractLesion(img, contour)
+        colors = [[255,255,255],[0,0,255],[0,0,0],[60,60,128],[60,60,128],[255,0,0]]
+        colorCount = [0, 0, 0, 0, 0, 0]
+        centers = [
+            # white
+            [200, 200, 200],
+            # red
+            [0, 0, 100],
+            # black
+            [64, 64, 64],
+            # brown
+            [98, 127, 174],
+            [33, 66, 130],
+            # grey blue
+            [75, 84, 111]
+        ]
+        distances = []
+        for i in range(0, len(centers)):
+            copy = np.copy(lesion)
+            center = centers[i]
+            copy[:,:,0] = np.subtract(copy[:,:,0], center[0])
+            copy[:,:,1] = np.subtract(copy[:,:,1], center[1])
+            copy[:,:,2] = np.subtract(copy[:,:,2], center[2])
+            r = np.power(copy[:,:,0], 2) + np.power(copy[:,:,1], 2) + np.power(copy[:,:,2], 2)
+            dd = np.sqrt(r)
+            distances.append(dd)
+        minDistances = np.min(distances, axis=0)
+        minIndexes = np.argmin(distances, axis=0)
+        h, w = np.shape(lesion)[:2]
+        for x in range(0, w):
+            for y in range(0, h):
+                if lesion[y][x][0]!=0 and lesion[y][x][1]!=0 and lesion[y][x][2]!=0:
+                    seuil = 35
+                    m = minIndexes[y][x]
+                    lesion[y][x] = colors[m]
+        cv2.imshow('nb colors', lesion)
+
     '''
         needed for Color C
         extracts the lesion
