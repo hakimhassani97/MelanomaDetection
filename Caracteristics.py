@@ -265,3 +265,50 @@ class Caracteristics:
         ret, mask = cv2.threshold(img2gray, 10, 255, cv2.THRESH_BINARY)
         lesion = cv2.bitwise_and(img, img, mask=mask)
         return lesion
+    
+    '''
+        Distance Between the center of gravity of contour and  center of circle around the contour
+    '''
+    @staticmethod
+    def AssymetryByDistanceByCircle(img, contour):
+        # get moment of contour
+        M = cv2.moments(contour)
+        # get center of gravity of contour
+        xe = int(M["m10"] / M["m00"])
+        ye = int(M["m01"] / M["m00"])
+        # get center of circle around the contour
+        #  center gravity
+        cv2.circle(img, (xe, ye), radius=2, color=(0, 255, 255), thickness=1)
+        (xCiCe, yCiCe), radius = cv2.minEnclosingCircle(contour)
+        xCiCe = int(xCiCe)
+        yCiCe = int(yCiCe)
+        cv2.circle(img, (xCiCe, yCiCe), radius=2, color=(0, 0, 255), thickness=1)
+        return 100 - (Caracteristics.DistanceEuclidean(xe, ye, xCiCe, yCiCe) * 100 / radius)
+
+
+    '''
+      Start  All About Diameter
+    '''
+    # caluclate Diameter by Diameter of Circle around contour
+    @staticmethod
+    def DiameterByCircle(img, contour):
+        (x, y), radius = cv2.minEnclosingCircle(contour)
+        # convert all values to int
+        center = (int(x), int(y))
+        radius = int(radius)
+        # and draw the circle in blue
+        img = cv2.circle(img, center, radius, (255, 0, 0), 2)
+        return (radius*2)
+
+    '''
+      End  All About Diameter
+    '''
+
+
+    '''
+        calculate the distance eclidiane
+    '''
+
+    def DistanceEuclidean(x1, y1, x2, y2):
+        dist = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+        return dist
