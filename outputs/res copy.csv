@@ -1,3 +1,4 @@
+id,BDD,type,img,DiameterByCircle,compactIndex,regularityIndex,regularityIndexPercentage,colorThreshold,nbColors,kurtosis,AssymetryByDistanceByCircle,roundness
 0,PH2,Melanoma,IMD058.bmp,666,2.8631,0.0125,0.3498,1,2982.1603,61271565.9862,91.5459,0.8266
 1,PH2,Melanoma,IMD061.bmp,954,3.3361,0.0117,0.3004,2,3431.241,70930180.4665,84.623,0.7114
 2,PH2,Melanoma,IMD063.bmp,604,1.4163,0.0094,0.707,2,2555.8152,44495088.6034,90.9905,0.9116
