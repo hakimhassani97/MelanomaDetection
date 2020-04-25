@@ -28,6 +28,7 @@ class Caracteristics:
         intersectionArea = contourArea - np.count_nonzero(blankImg)
         # get the ratio between intersectionArea and the contourArea
         roundness = intersectionArea/contourArea
+        print(roundness)
         return roundness
     
     '''
@@ -122,8 +123,10 @@ class Caracteristics:
         #             r = (float(center[0])-float(center2[0]))**2 + (float(center[1])-float(center2[1]))**2 + (float(center[2])-float(center2[2]))**2
         #             d = math.sqrt(r)
         #             distances = np.append(distances, d)
-        print(np.sum(distances))
-        cv2.imshow('nb colors', lesion)
+        s = np.sum(distances)
+        print(s)
+        # cv2.imshow('nb colors', lesion)
+        return s
     
     '''
         needed for Color C
@@ -155,7 +158,8 @@ class Caracteristics:
         r = np.power(r, 4)
         r = np.sum(r) / area
         print(r)
-        cv2.imshow('nb colors hsv', lesion)
+        # cv2.imshow('nb colors hsv', lesion)
+        return r
     
     '''
         needed for color C
@@ -283,7 +287,9 @@ class Caracteristics:
         xCiCe = int(xCiCe)
         yCiCe = int(yCiCe)
         cv2.circle(img, (xCiCe, yCiCe), radius=2, color=(0, 0, 255), thickness=1)
-        return 100 - (Caracteristics.DistanceEuclidean(xe, ye, xCiCe, yCiCe) * 100 / radius)
+        asm = 100 - (Caracteristics.DistanceEuclidean(xe, ye, xCiCe, yCiCe) * 100 / radius)
+        print(asm)
+        return asm
 
 
     '''
