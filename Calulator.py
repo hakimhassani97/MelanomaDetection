@@ -1,4 +1,8 @@
 import csv
+import cv2
+import numpy as np
+from Contours import Contours
+from Caracteristics import Caracteristics
 from Data import Data
 
 class Calculator:
@@ -39,8 +43,56 @@ class Calculator:
                     sImg = DATA+t+'/'+file
                     writer.writerow([i, BDD, t, file])
                     i+=1
+    
+    @staticmethod
+    def addColumn(out, DATA_SRC):
+        '''
+            adds a column to each row
+        '''
+        # read old file
+        old, i = Calculator.getData(out)
+        colIndex = len(old[0])
+        f = open('outputs/'+out, 'w', newline='')
+        with f:
+            writer = csv.writer(f)
+            BDDS = ['PH2', 'ISIC']
+            for BDD in BDDS:
+                DATA = DATA_SRC+BDD+'/'
+                types = ['Melanoma', 'Nevus']
+                for t in types:
+                    files = Data.loadFilesAsArray(DATA+t)
+                    for file in files:
+                        sImg = DATA+t+'/'+file
+                        r = Calculator.find(old, 3, file)
+                        if r!=None:
+                            # del r[-1]
+                            img = cv2.imread(sImg, cv2.IMREAD_COLOR)
+                            contour = Contours.contours2(img)
+                            # car = Caracteristics.DiameterByCircle(img, contour)
+                            # car = Caracteristics.compactIndex(contour)
+                            # car = Caracteristics.regularityIndex(contour)
+                            # car = Caracteristics.regularityIndexPercentage(contour)
+                            # car = Caracteristics.colorThreshold(img, contour)
+                            # car = Caracteristics.nbColors(img, contour)
+                            # car = Caracteristics.kurtosis(img, contour)
+                            # car = Caracteristics.AssymetryByDistanceByCircle(img, contour)
+                            # car = Caracteristics.roundness(img, contour)
+                            car = round(car, 4)
+                            r.append(car)
+                            writer.writerow(r)
+    
+    @staticmethod
+    def find(data, col, x):
+        '''
+            finds x in the data[col]
+        '''
+        for d in data:
+            if len(d)>col and d[col]==x:
+                return d
+        return None
 
 BDD_LOCATION = 'D:/HAKIM/MIV M2/PFE/fichiers prof/MIV 96-2019/Application MIV 96-2019/Code/BDD/'
 
-Calculator.fillDbTypeNames('res.csv', BDD_LOCATION, 'PH2')
-Calculator.fillDbTypeNames('res.csv', BDD_LOCATION, 'ISIC')
+# Calculator.fillDbTypeNames('res.csv', BDD_LOCATION, 'PH2')
+# Calculator.fillDbTypeNames('res.csv', BDD_LOCATION, 'ISIC')
+# Calculator.addColumn('res.csv', BDD_LOCATION)
