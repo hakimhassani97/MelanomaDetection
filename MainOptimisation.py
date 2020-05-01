@@ -59,11 +59,15 @@ class MainOptimisation:
         _ = joblib.dump(scaler, 'outputs/models/scaler'+str(version)+'.pkl', compress=9)
         _ = joblib.dump(pca, 'outputs/models/pca'+str(version)+'.pkl', compress=9)
     
-    def trainOneCol(col):
+    def trainOneCol(col, BDD=None):
         '''
             do training on one column of data
         '''
-        XData = pd.read_csv('outputs/resnew.csv', header=None)
+        if BDD == None:
+            BDD = ''
+        else:
+            BDD = ' '+BDD
+        XData = pd.read_csv('outputs/resnew'+BDD+'.csv', header=None)
         target = XData.loc[:,2]
         X = XData.loc[:,col:col]
         # scaler = StandardScaler()
@@ -81,7 +85,7 @@ class MainOptimisation:
         logisticRegr = LogisticRegression(solver = 'lbfgs')
         logisticRegr.fit(train_data, train_lbl)
         # Predict for One Observation (image)
-        prediction = logisticRegr.predict(test_data[40].reshape(1,-1))
+        # prediction = logisticRegr.predict(test_data[40].reshape(1,-1))
         # score of training
         score = logisticRegr.score(test_data, test_lbl)
         print('col = ', col, ', score = ', score)
@@ -107,8 +111,8 @@ class MainOptimisation:
         FP = len(fps) / total
         print('fn = ', FN, ', fp = ', FP, ', T = ', T)
         # save the classifier
-        # version = 1
-        # _ = joblib.dump(logisticRegr, 'outputs/finals/logisticRegr col'+str(col)+' '+str(version)+'.pkl', compress=9)
+        version = BDD
+        _ = joblib.dump(logisticRegr, 'outputs/finals/logisticRegr col'+str(col)+' '+str(version)+'.pkl', compress=9)
         # _ = joblib.dump(scaler, 'outputs/finals/scaler col'+str(col)+' '+str(version)+'.pkl', compress=9)
         return results, fns, fps
     
@@ -208,11 +212,17 @@ class MainOptimisation:
         cv2.destroyAllWindows()
     
     @staticmethod
-    def testFinals(col):
+    def testFinals(col, seuil, BDD=None, op=None):
         '''
             test final results and thresholds
         '''
-        XData = pd.read_csv('outputs/resnew.csv', header=None)
+        if BDD == None:
+            BDD = ''
+        else:
+            BDD = ' '+BDD
+        XData = pd.read_csv('outputs/resnew'+BDD+'.csv', header=None)
+        # bdd = XData.loc[:,1].values
+        # print(bdd[bdd=='PH2'])
         target = XData.loc[:,2].values
         X = XData.loc[:,col:col].values
         # predict
@@ -227,14 +237,24 @@ class MainOptimisation:
             t = target[i]
             df = pd.DataFrame({'car':X[i] , 'target':t, 'prediction':p})
             results = results.append(df, ignore_index=True)
+            print(X[i][0], p)
         # verify thresholds
-        print(len(results[results['car']<5.83]['target']))
-        print(len(results[(results['car']<5.83) & (results['target']==1)]['target']))
-        print(len(results[(results['car']<5.83) & (results['target']==0)]['target']))
-        print('-------------')
-        print(len(results[results['car']>=5.83]['target']))
-        print(len(results[(results['car']>=5.83) & (results['target']==1)]['target']))
-        print(len(results[(results['car']>=5.83) & (results['target']==0)]['target']))
+        # print(len(results[results['car']<seuil]['target']))
+        # print('target = 1, <seuil,',len(results[(results['car']<seuil) & (results['target']==1)]['target'])/len(results[results['car']<seuil]['target']))
+        # print('target = 0, <seuil,',len(results[(results['car']<seuil) & (results['target']==0)]['target'])/len(results[results['car']<seuil]['target']))
+        # print('-------------')
+        # print(len(results[results['car']>=seuil]['target']))
+        # print('target = 1, >=seuil,',len(results[(results['car']>=seuil) & (results['target']==1)]['target'])/len(results[results['car']>=seuil]['target']))
+        # print('target = 0, >=seuil,',len(results[(results['car']>=seuil) & (results['target']==0)]['target'])/len(results[results['car']>=seuil]['target']))
+        # verify accuracy
+        # op means the default target when < seuil
+        total = len(results['target'])
+        if op == 0:
+            truths = len(results[((results['car']<seuil) & (results['target']==0)) | ((results['car']>=seuil) & (results['target']==1))]['target'])
+        else:
+            truths = len(results[((results['car']>=seuil) & (results['target']==0)) | ((results['car']<seuil) & (results['target']==1))]['target'])
+        print('total =',total)
+        print('accuracy =',truths/total)
 
     @staticmethod
     def applyPca():
@@ -257,11 +277,15 @@ class MainOptimisation:
         # xpca = pca.fit_transform(X)
         # print(xpca[0])
     
-    def plotCol(col):
+    def plotCol(col, BDD=None):
         '''
             draws the graph of col
         '''
-        XData = pd.read_csv('outputs/resnew.csv', header=None)
+        if BDD == None:
+            BDD = ''
+        else:
+            BDD = ' '+BDD
+        XData = pd.read_csv('outputs/resnew'+BDD+'.csv', header=None)
         data = XData.loc[1:,col:col]
         labels = XData.loc[1:,2:2]
         plt.plot(labels, data, 'b^', ms=1)
@@ -288,14 +312,96 @@ class MainOptimisation:
         print(np.min(neg), np.max(pos))
         plt.ylabel('asymmetryByBestFitEllipse')
         plt.xlabel('class')
-        plt.show()
+        # plt.show()
+    
+    def saveThreshClassification(thresholds, ops, BDD=None):
+        '''
+            save the thresholds classification results to csv file
+        '''
+        if BDD == None:
+            BDD = ''
+        else:
+            BDD = ' '+BDD
+        XData = pd.read_csv('outputs/resnew'+BDD+'.csv', header=None)
+        data = XData.loc[:,4:25]
+        labels = XData.loc[:,2:2]
+        print(len(labels))
+        col = 7
+        if ops[col-4] == 0:
+            TN = len(data[(data.loc[:,col]<thresholds[col-4]) & (labels.loc[:,2]==0)][col])
+            TP = len(data[(data.loc[:,col]>=thresholds[col-4]) & (labels.loc[:,2]==1)][col])
+            print(TN, TP)
+        else:
+            TN = len(data[(data.loc[:,col]>=thresholds[col-4]) & (labels.loc[:,2]==0)][col])
+            TP = len(data[(data.loc[:,col]<thresholds[col-4]) & (labels.loc[:,2]==1)][col])
+            print(TN, TP)
+    
+    @staticmethod
+    def testThresholds(col, seuil, BDD=None, op=None):
+        '''
+            test thresholds
+        '''
+        if BDD == None:
+            BDD = ''
+        else:
+            BDD = ' '+BDD
+        XData = pd.read_csv('outputs/resnew'+BDD+'.csv', header=None)
+        target = XData.loc[:,2].values
+        data = XData.loc[:,col:col].values
+        # predict
+        target = np.array(target)
+        data = np.array(data)
+        results = pd.DataFrame()
+        for i in range(0, len(data)):
+            if op == 0:
+                if data[i] < seuil:
+                    p = 0
+                else:
+                    p = 1
+            else:
+                if data[i] >= seuil:
+                    p = 0
+                else:
+                    p = 1
+            t = target[i]
+            df = pd.DataFrame({'car':data[i] , 'target':t, 'prediction':p})
+            results = results.append(df, ignore_index=True)
+        # verify accuracy
+        # op means the default target when < seuil
+        total = len(results['target'])
+        if op == 0:
+            truths = len(results[((results['car']<seuil) & (results['target']==0)) | ((results['car']>=seuil) & (results['target']==1))]['target'])
+        else:
+            truths = len(results[((results['car']>=seuil) & (results['target']==0)) | ((results['car']<seuil) & (results['target']==1))]['target'])
+        print('total =',total)
+        print('accuracy =',truths/total)
+        return results['prediction']
 
 # for col in range(4,26):
 #     MainOptimisation.trainOneCol(col)
-# MainOptimisation.plotCol(4)
-# results, fns, fps = MainOptimisation.trainOneCol(4)
-MainOptimisation.testFinals(4)
-# MainOptimisation.plotResults(results, fns, fps)
+# MainOptimisation.plotCol(4, BDD='PH2')
+# for col in range(4,26):
+#     print('-----------------------------')
+#     results, fns, fps = MainOptimisation.trainOneCol(col, BDD='ISIC')
+#     MainOptimisation.plotResults(results, fns, fps)
+# MainOptimisation.testFinals(7, 22.2, BDD='PH2')
+# test thresholds for each column (ISIC and PH2)
+# thresholds = [5.83, 90.265, 10.695, 13.63, 21.61, 60.255, 65.115, 1087.5, 0.03, 0.645, 1.66, 1.28, 166.5, 1.45, 3.5, 1.5, 3.5, 9.37, 61.35, 390.0, 396.22, 4.37]
+# thresholdsPH2 = [5.325, 91.415, 9.375 , 22.2  , 41.59 , 58.57, 41.745, 2240.0, 0.015, 0.575, 2.22, 1.445, 291.5, 0.67, 3.0, 4.0, 5.5, 9.54, 63.84, 697.0, 801.485, 9.035]
+thresholdsPH2 = np.array([8.26, 84.69, 14.21, 17.83, 34.77, 16.93, 51.2, 1939, 0.01, 0.51, 1.96, 1.4, 315, 0.8, 1, 4, 6, 7.26, 46.87, 722, 743.65, 9.27])
+thresholdsISIC = np.array([4.23, 93.61, 7.31, 12.28, 16.17, 10.18, 73.42, 900, 0.02, 0.71, 1.37, 1.2, 145, 1.6, 3, 2, 3, 10.25, 66.93, 342, 323.27, 3.63])
+opsPH2 = [0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0]
+opsISIC = [0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0]
+predictions = pd.DataFrame()
+for col in range(4,26):
+    # col = 4
+    thresh = thresholdsPH2[col-4]
+    # thresh = 8.96
+    print('-------------------------------------')
+    print('col =', col, thresh)
+    predictions[col] = MainOptimisation.testThresholds(col, thresh, BDD='PH2', op=opsPH2[col-4])
+print(predictions)
+# MainOptimisation.saveThreshClassification(thresholdsPH2, opsPH2, BDD='PH2')
 # MainOptimisation.train()
 # MainOptimisation.trainSvm()
 # MainOptimisation.trainNN()
