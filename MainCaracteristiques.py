@@ -10,6 +10,8 @@ from Asymmetry import Asymmetry
 from Border import Border
 from Color import Color
 from Diameter import Diameter
+from SevenPointsChecklist import SevenPointsChecklist
+from Menzies import Menzies
 
 class MainCaracteristiques:
     '''
@@ -103,6 +105,12 @@ class MainCaracteristiques:
                             # car.append(Diameter.diameterMinEnclosingCircle(img, contour))
                             # car.append(Diameter.diameterOpenCircle(img, contour))
                             # car.append(Diameter.diameterLengtheningIndex(img, contour))
+                            # 7 points
+                            # car.append(SevenPointsChecklist.inflammationAndBloodness(img, contour))
+                            # car.append(SevenPointsChecklist.sensibility(img, contour))
+                            # menzies
+                            car.append(Menzies.darkPoints(img, contour))
+                            car.append(Menzies.blueGrey(img, contour))
                             r = np.append(r, car)
                             writer.writerow(r)
                             print('['+str(curr)+'/'+str(total)+']')
@@ -125,4 +133,4 @@ BDD_LOCATION = 'D:/HAKIM/MIV M2/PFE/fichiers prof/MIV 96-2019/Application MIV 96
 
 # MainCaracteristiques.fillDbTypeNames('resnew.csv', BDD_LOCATION, 'PH2')
 # MainCaracteristiques.fillDbTypeNames('resnew.csv', BDD_LOCATION, 'ISIC')
-# MainCaracteristiques.addColumn('resnew.csv', BDD_LOCATION)
+MainCaracteristiques.addColumn('resnew.csv', BDD_LOCATION)
