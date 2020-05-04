@@ -34,9 +34,11 @@ def getDataMatrix(s, t, minimum):
                 ((opsPH2[s]==0) & (A<thresholdsPH2[s]))
                 | ((opsPH2[s]==1) & (A>=thresholdsPH2[s]))
             ]
-        if len(carMelanome) >= minimum:# and target[i]==t:
+        if len(carMelanome) >= minimum and target[i]==t:
             AMelanome.append(A)
             # print(carMelanome)
+        # if len(AMelanome)==25:
+        #     break
     return AMelanome
 
 def getColumnsToUse(T):
@@ -83,18 +85,21 @@ def distance(T, AMelanome, t):
         else:
             # d = 999999
             pass
+    # return round(d, 2)
     return d
 
 def Utility(d1, d2):
     '''
         Utility functions between S1 and S2
     '''
-    return d1 - d2
+    return d2 - d1
 
 # information
 cars = range(4, 26)
 cars = np.array(cars)
-thresholdsPH2 = np.array([8.26, 84.69, 14.21, 17.83, 34.77, 16.93, 51.2, 1939, 0.01, 0.51, 1.96, 1.4, 315, 0.8, 1, 4, 6, 7.26, 46.87, 722, 743.65, 9.27])
+# old thresh
+# thresholdsPH2 = np.array([2.58, 92.87, 6.39, 12.51, 15.67, 12.76, 55.73, 1560, 0.02, 0.56, 1.81, 1.35, 219, 1, 5, 2, 4, 9.83, 63.69, 474, 549.18, 4.54])
+thresholdsPH2 = np.array([2.65, 92.87, 6.39, 13.2, 17.2, 15.44, 55.73, 1560, 0.02, 0.56, 1.81, 1.35, 219, 1, 5, 2, 5, 9.51, 63.69, 560, 572.24, 4.54])
 thresholdsISIC = np.array([4.23, 93.61, 7.31, 12.28, 16.17, 10.18, 73.42, 900, 0.02, 0.71, 1.37, 1.2, 145, 1.6, 3, 2, 3, 10.25, 66.93, 342, 323.27, 3.63])
 opsPH2 = np.array([0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0])
 opsISIC = np.array([0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0])
@@ -105,33 +110,39 @@ sEnds = [6, 14, 19, 22]
 # load data
 target, data = load()
 ds = []
-i = 130
-for i in range(0, len(data)):
+im = 198
+for im in range(0, len(data)):
     # take a sample T
-    T = data[i]
+    T = data[im]
     cars = getColumnsToUse(T)
     cols = range(0, 22)
     cols = np.array(cols)
     sMelanome = cols[cars==1]
     sNonMelanome = cols[cars==0]
-    print(cars, sMelanome, sNonMelanome)
-###################################
-# # strategy
-# s = 0
-# # target (player)
-# t = 1
-# sMelanome0 = getColsFromStrategy(s, sMelanome)
-# AMelanome = getDataMatrix(sMelanome0, t=t, minimum=len(sMelanome0))
-# # get the distance between T and AMelanome
-# d = distance(T[sMelanome0], AMelanome, t)
-# print(target[i], d)
-###################################
-# fill distances for player 1 (t==1)
+    # sMelanome = np.delete(sMelanome, [0,1,2,3,4])
+    # sNonMelanome = np.delete(sNonMelanome, [0,1,2,3,4])
+    # cols = np.delete(cols, [0,1,2,3,4])
+    # print(cars, sMelanome, sNonMelanome)
+    ###################################
+    # # strategy
+    # s = 0
+    # # target (player)
+    # t = 1
+    # sMelanome0 = getColsFromStrategy(s, sMelanome)
+    # AMelanome = getDataMatrix(sMelanome0, t=t, minimum=len(sMelanome0))
+    # # get the distance between T and AMelanome
+    # d = distance(T[sMelanome0], AMelanome, t)
+    # print(target[i], d)
+    ###################################
+    # fill distances for player 1 (t==1)
     t = 1
     d1 = []
+    strategies1 = []
     for s1 in range(0, 4):
         sMelanome1 = getColsFromStrategy(s1, sMelanome)
         if len(sMelanome1)>0:
+            strategies1.append(s1)
+            sMelanome1 = cols[sStarts[s1]:sEnds[s1]]
             mins = [[6, 8, 5, 3], [6, 7, 2, 3]]
             maximum = min([len(sMelanome1), mins[t][s1]])
             M = getDataMatrix(sMelanome1, t=t, minimum=maximum)
@@ -141,31 +152,46 @@ for i in range(0, len(data)):
                 d = distance(T[sMelanome1], M, t)
                 d1.append(d)
     d1 = np.array(d1)
-    print('d1 =', d1)
+    # print('d1 =', d1, 'strategies =', strategies1)
     # fill distances for player 2 (t==0)
-    t = 1
+    t = 0
     d2 = []
+    strategies2 = []
     for s2 in range(0, 4):
         sMelanome2 = getColsFromStrategy(s2, sNonMelanome)
         if len(sMelanome2)>0:
+            strategies2.append(s2)
+            sMelanome2 = cols[sStarts[s2]:sEnds[s2]]
             mins = [[6, 8, 5, 3], [6, 7, 2, 3]]
             maximum = min([len(sMelanome2), mins[t][s2]])
-            M = getDataMatrix(sMelanome2, t=t, minimum=maximum)
+            M = getDataMatrix(sMelanome2, t=1, minimum=maximum)
             M = np.array(M)
             # get the distance between T and M
             if(len(M)>0):
                 d = distance(T[sMelanome2], M, t)
                 d2.append(d)
     d2 = np.array(d2)
-    print('d2 =', d2)
-# construct the game
-game = np.zeros((len(d1), len(d2)))
-for i in range(0, len(d1)):
-    for j in range(0, len(d2)):
-        game[i, j] = Utility(d1[i], d2[j])
-print(game)
-
-
+    # print('d2 =', d2, 'strategies =', strategies2)
+    # construct the game
+    game = np.zeros((len(d1), len(d2)))
+    for i in range(0, len(d1)):
+        for j in range(0, len(d2)):
+            game[i, j] = Utility(d1[i], d2[j])
+    # print(game)
+    gg = game
+    game = nash.Game(game)
+    equilibria = game.support_enumeration()
+    if len(d1)==0:
+        print('img=', im, 'target=', target[im], 0)
+    elif len(d2)==0:
+        print('img=', im, 'target=', target[im], 1)
+    else:
+        for en in equilibria:
+            # print(en)
+            ii = np.argmax(en[0])
+            jj = np.argmax(en[1])
+            print('img=', im, 'target=', target[im], 1 if gg[ii, jj]>=0 else 0)
+            break
 
 ##################
 # ds = np.array(ds)
