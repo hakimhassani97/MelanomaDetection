@@ -27,13 +27,15 @@ def getBestThresholds(col, seuil, BDD=None, op=None):
         # verify accuracy
         # op means the default target when < seuil
         if op == 0:
-            truths = len(results[((results['car']<seuil) & (results['target']==0)) | ((results['car']>=seuil) & (results['target']==1))]['target'])
+            truths0 = len(results[((results['car']<seuil) & (results['target']==0))]['target'])
+            truths = len(results[((results['car']>=seuil) & (results['target']==1))]['target'])
         else:
-            truths = len(results[((results['car']>=seuil) & (results['target']==0)) | ((results['car']<seuil) & (results['target']==1))]['target'])
+            truths0 = len(results[((results['car']>=seuil) & (results['target']==0))]['target'])
+            truths = len(results[((results['car']<seuil) & (results['target']==1))]['target'])
         # print('total =',total)
         # print('accuracy =',truths/total)
         # print(np.mean(results[results['target']==1]['car']))
-        accuracies = np.append(accuracies, truths/total)
+        accuracies = np.append(accuracies, (truths0/160)+(1.5*truths/40))
     mx = np.argmax(accuracies)
     print(accuracies[mx], data[mx])
     if len(data[(data<data[mx])]) < len(data[(data>=data[mx])]):
@@ -56,4 +58,4 @@ for col in range(4,26):
     thresh = 19
     print('-------------------------------------')
     print('col =', col, thresh)
-    getBestThresholds(col, thresh, BDD='ISIC', op=opsISIC[col-4])
+    getBestThresholds(col, thresh, BDD='PH2', op=opsPH2[col-4])
