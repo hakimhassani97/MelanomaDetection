@@ -155,7 +155,7 @@ for im in range(0, len(data)):
     # print('d1 =', d1, 'strategies =', strategies1)
     # fill distances for player 2 (t==0)
     t = 0
-    # d2 = []
+    d2 = []
     strategies2 = []
     for s2 in range(0, 4):
         sMelanome2 = getColsFromStrategy(s2, sNonMelanome)
