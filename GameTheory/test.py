@@ -177,7 +177,7 @@ for im in range(0, len(data)):
     for i in range(0, len(d1)):
         for j in range(0, len(d2)):
             game[i, j] = Utility(d1[i], d2[j])
-    print(game)
+    # print(game)
     gg = game
     game = nash.Game(game)
     equilibria = game.support_enumeration()
