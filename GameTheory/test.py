@@ -180,7 +180,7 @@ for im in range(0, len(data)):
     # print(game)
     gg = game
     game = nash.Game(game)
-    # equilibria = game.support_enumeration()
+    equilibria = game.support_enumeration()
     if len(d1)==0:
         print('img=', im, 'target=', target[im], 0)
     elif len(d2)==0:
