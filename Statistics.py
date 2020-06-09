@@ -35,7 +35,8 @@ class Statistics:
         area = np.count_nonzero(img==255)
         areaTruth = np.count_nonzero(imgTruth==255)
         intersectionArea = np.count_nonzero(intersection==255)
-        return (intersectionArea/area + intersectionArea/areaTruth) / 2
+        # return (intersectionArea/area + intersectionArea/areaTruth) / 2
+        return 2*intersectionArea/(area+areaTruth)
     
     '''
         compares all the images for a giver database
