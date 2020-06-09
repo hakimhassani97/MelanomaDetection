@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn import svm
 from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import precision_recall_fscore_support as score
 import cv2
 from Data import Data
 from Contours import Contours
@@ -143,6 +144,12 @@ class MainOptimisation:
         # test = np.reshape(np.array(test), (1, -1))
         # print(test)
         # print(r.predict(test))
+        predicted = r.predict(X_test)
+        precision, recall, fscore, support = score(target_test, predicted)
+        print('precision: {}'.format(precision))
+        print('recall: {}'.format(recall))
+        print('fscore: {}'.format(fscore))
+        print('support: {}'.format(support))
     
     def trainNN():
         '''
@@ -388,21 +395,21 @@ class MainOptimisation:
 # test thresholds for each column (ISIC and PH2)
 # thresholds = [5.83, 90.265, 10.695, 13.63, 21.61, 60.255, 65.115, 1087.5, 0.03, 0.645, 1.66, 1.28, 166.5, 1.45, 3.5, 1.5, 3.5, 9.37, 61.35, 390.0, 396.22, 4.37]
 # thresholdsPH2 = [5.325, 91.415, 9.375 , 22.2  , 41.59 , 58.57, 41.745, 2240.0, 0.015, 0.575, 2.22, 1.445, 291.5, 0.67, 3.0, 4.0, 5.5, 9.54, 63.84, 697.0, 801.485, 9.035]
-thresholdsPH2 = np.array([8.26, 84.69, 14.21, 17.83, 34.77, 16.93, 51.2, 1939, 0.01, 0.51, 1.96, 1.4, 315, 0.8, 1, 4, 6, 7.26, 46.87, 722, 743.65, 9.27])
-thresholdsISIC = np.array([4.23, 93.61, 7.31, 12.28, 16.17, 10.18, 73.42, 900, 0.02, 0.71, 1.37, 1.2, 145, 1.6, 3, 2, 3, 10.25, 66.93, 342, 323.27, 3.63])
-opsPH2 = [0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0]
-opsISIC = [0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0]
-predictions = pd.DataFrame()
-for col in range(4,26):
-    # col = 4
-    thresh = thresholdsPH2[col-4]
-    # thresh = 8.96
-    print('-------------------------------------')
-    print('col =', col, thresh)
-    predictions[col] = MainOptimisation.testThresholds(col, thresh, BDD='PH2', op=opsPH2[col-4])
-print(predictions)
+# thresholdsPH2 = np.array([8.26, 84.69, 14.21, 17.83, 34.77, 16.93, 51.2, 1939, 0.01, 0.51, 1.96, 1.4, 315, 0.8, 1, 4, 6, 7.26, 46.87, 722, 743.65, 9.27])
+# thresholdsISIC = np.array([4.23, 93.61, 7.31, 12.28, 16.17, 10.18, 73.42, 900, 0.02, 0.71, 1.37, 1.2, 145, 1.6, 3, 2, 3, 10.25, 66.93, 342, 323.27, 3.63])
+# opsPH2 = [0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0]
+# opsISIC = [0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0]
+# predictions = pd.DataFrame()
+# for col in range(4,26):
+#     # col = 4
+#     thresh = thresholdsPH2[col-4]
+#     # thresh = 8.96
+#     print('-------------------------------------')
+#     print('col =', col, thresh)
+#     predictions[col] = MainOptimisation.testThresholds(col, thresh, BDD='PH2', op=opsPH2[col-4])
+# print(predictions)
 # MainOptimisation.saveThreshClassification(thresholdsPH2, opsPH2, BDD='PH2')
 # MainOptimisation.train()
-# MainOptimisation.trainSvm()
+MainOptimisation.trainSvm()
 # MainOptimisation.trainNN()
 # MainOptimisation.test()
